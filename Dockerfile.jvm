@@ -1,0 +1,15 @@
+FROM amazoncorretto:11.0.8-al2 as builder
+
+WORKDIR /app
+COPY . /app
+
+RUN /app/sbt assembly
+
+FROM amazoncorretto:11.0.8-alpine
+
+EXPOSE 8080
+
+WORKDIR /app
+COPY --from=builder /app/target/scala-2.13/zio-api-assembly-0.0.1.jar /app/zio-api.jar
+
+ENTRYPOINT ["java", "-jar", "/app/zio-api.jar"]

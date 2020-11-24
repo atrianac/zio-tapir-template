@@ -1,0 +1,13 @@
+.bloop 
+.metals 
+.idea
+.vscode
+target 
+project/target
+project/project
+.ammonite/
+metals.sbt
+.git
+.scalafmt.conf
+Dockerfile*
+README.md
