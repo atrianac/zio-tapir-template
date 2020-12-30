@@ -19,18 +19,19 @@ lazy val root = (project in file("."))
     scalaVersion := "2.13.3",
     maxErrors := 3,
     libraryDependencies ++= Seq(
-      "org.http4s" %% "http4s-blaze-server"  % Http4sVersion,
-      "org.http4s" %% "http4s-blaze-client"  % Http4sVersion,
-      "org.http4s" %% "http4s-circe"         % Http4sVersion,
-      "org.http4s" %% "http4s-dsl"           % Http4sVersion,
-      "io.circe"   %% "circe-generic"        % CirceVersion,
-      "io.circe"   %% "circe-generic-extras" % CirceVersion,
-      "dev.zio"    %% "zio"                  % ZioVersion,
-      "dev.zio"    %% "zio-interop-cats"     % ZioCatsIterop,
-      "dev.zio"    %% "zio-config"           % ZioConfig,
-      "dev.zio"    %% "zio-test"             % ZioVersion % "test",
-      "dev.zio"    %% "zio-test-sbt"         % ZioVersion % "test",
-      "dev.zio"    %% "zio-test-magnolia"    % ZioVersion % "test"
+      "org.http4s"    %% "http4s-blaze-server"  % Http4sVersion,
+      "org.http4s"    %% "http4s-blaze-client"  % Http4sVersion,
+      "org.http4s"    %% "http4s-circe"         % Http4sVersion,
+      "org.http4s"    %% "http4s-dsl"           % Http4sVersion,
+      "io.circe"      %% "circe-generic"        % CirceVersion,
+      "io.circe"      %% "circe-generic-extras" % CirceVersion,
+      "dev.zio"       %% "zio"                  % ZioVersion,
+      "dev.zio"       %% "zio-interop-cats"     % ZioCatsIterop,
+      "dev.zio"       %% "zio-config"           % ZioConfig,
+      "org.scalameta" %% "svm-subs"             % "20.2.0" % Compile,
+      "dev.zio"       %% "zio-test"             % ZioVersion % Test,
+      "dev.zio"       %% "zio-test-sbt"         % ZioVersion % Test,
+      "dev.zio"       %% "zio-test-magnolia"    % ZioVersion % Test
     )
   )
 
@@ -62,22 +63,30 @@ graalVMNativeImageOptions ++= Seq(
   "--verbose",
   "--no-server",
   "--no-fallback",
-  "allow-incomplete-classpath",
   "--install-exit-handlers",
+  "--allow-incomplete-classpath",
+  "--enable-all-security-services",
   "-J-Xmx8G",
   "-J-Xms4G",
   "-H:+ReportUnsupportedElementsAtRuntime",
   "-H:+ReportExceptionStackTraces",
-  "-H:+TraceClassInitialization",
   "-H:+PrintClassInitialization",
   "-H:+RemoveSaturatedTypeFlows",
-  "--initialize-at-build-time=scala.runtime.Statics$VM"
+  "-H:EnableURLProtocols=http,https,tcp",
+  "-H:+JNI",
+  "-Dio.netty.noUnsafe=true",
+  "--initialize-at-build-time=scala.runtime.Statics$VM",
+  "-Dio.netty.leakDetection.level=DISABLED",
+  "--allow-incomplete-classpath",
+  "--report-unsupported-elements-at-runtime",
+  "--initialize-at-run-time=io.netty.channel.DefaultChannelId"
 )
 
 val os = System.getProperty("os.name").toLowerCase()
 
 val graalSpcOpts = os match {
-  case linux if linux.contains("linux") => Seq("--static", "-H:UseMuslC=../../bundle/")
+  case linux if linux.contains("linux") =>
+    Seq("--static", "--libc=musl")
   case _                                => Seq.empty
 }
 graalVMNativeImageOptions ++= graalSpcOpts
