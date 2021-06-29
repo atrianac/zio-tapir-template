@@ -1,0 +1,13 @@
+name: github-actions-test
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run ls command
+        run: ls
+      - name: Echo statement
+        run: echo Katie
+
+
