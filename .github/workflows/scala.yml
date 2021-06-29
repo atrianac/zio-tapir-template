@@ -20,5 +20,11 @@ jobs:
         distribution: 'adopt'
     - name: Run tests
       run: sbt test
-    - name: Build and push Docker images
-      uses: docker/build-push-action@v2.5.0
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build docker image
+      run: docker build . -t rychlkat/graalvm-ce:20.3.0-java11 -f Dockerfile.prebuild.graalvm
+    - run: echo "Base image built with tag rychlkat/graalvm-ce:20.3.0-java11"
+    
